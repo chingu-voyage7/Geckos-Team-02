@@ -8,7 +8,7 @@
     width: 100%;
     padding-top: 10rem;
     min-height: 100vh;
-    background: linear-gradient(rgba(1, 55, 65, 0.699), rgb(255, 231, .8));
+    background: linear-gradient(rgba(1, 55, 65, 0.699), rgb(255, 102, 0));
 }
 
 .user_input, .result {
