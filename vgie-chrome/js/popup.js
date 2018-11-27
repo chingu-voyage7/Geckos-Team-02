@@ -1,6 +1,6 @@
 
 $(document).ready(function () {
-  $('#input').focus();
+  $('.search-input').focus();
 
   /*** trim long titles ***/
   function trimStr(str) {
@@ -13,7 +13,7 @@ $(document).ready(function () {
 var submit_search = function () {
 
   /*** API URL with CORS proxy ***/
-  var url = 'https://cors-anywhere.herokuapp.com/https://api-endpoint.igdb.com/games/?search=' + $('#input').val() + '&fields=id,name,rating,genres,platforms,videos,cover,artworks';
+  var url = 'https://cors-anywhere.herokuapp.com/https://api-endpoint.igdb.com/games/?search=' + $('.search-input').val() + '&fields=id,name,rating,genres,platforms,videos,cover,artworks';
   var genre_id;
 
   /*** Game Data ***/
@@ -26,17 +26,20 @@ var submit_search = function () {
     }
   }).done(function (response) {
     console.log(response);
-    $(".result").empty();
+    $(".game-output").empty();
     for (var i = 0; i < response.length; i++) {
-      $(".result").append('<div class="game"><img src="http:' + response[i].cover.url + '" alt="game cover art">' + '<p class="game-title">' + trimStr(response[i].name) + '</p>' + '<p class="game-genre">' + response[i].genres + '</p>' + '</div>');
+        //store in objects here.
+        $(".game-output").append('<div class="game"><img src="http:' + response[i].cover.url + '" alt="game cover art">' + '<p class="game-title">' + trimStr(response[i].name) + '</p>' + '<p class="game-genre">' + response[i].genres + '</p>' + '</div>');
       genre_id = response[i].genres;
     }
+    //display first object here
+    //&(".game-cover").attr("src", games[currentSelection].coverUrl);
     console.log(genre_id);
   });
 }
 
-  $('#submit').on('click', submit_search);
-  $('#input').keydown(function(e) {
+  $('.search-submit').on('click', submit_search);
+  $('.search-input').keydown(function(e) {
     console.log(e);
     if(e.keyCode == 13)
     {

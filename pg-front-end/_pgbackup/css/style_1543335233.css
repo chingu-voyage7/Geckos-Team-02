@@ -1,0 +1,23 @@
+.search-input {
+    padding: 20px;
+    margin: 20px;
+    width: 440px;
+}
+
+.search-icon {
+    margin: 10px;
+    margin-left: 20px;
+}
+
+.previous-icon {
+    margin: 50px;
+}
+
+.next-icon {
+    margin: 50px;
+}
+
+.game-cover {
+    margin: 10px;
+    margin-left: 22px;
+}
