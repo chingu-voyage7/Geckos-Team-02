@@ -102,8 +102,14 @@ input {
 }
 
 .game-output {
+    display: flex;
     margin: 25px;
     width: 550px;
     height: 250px;
     font-size: 20px;
+    overflow: auto;
+}
+
+.game {
+    margin: 25px;
 }
