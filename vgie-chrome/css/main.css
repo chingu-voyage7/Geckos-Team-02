@@ -112,4 +112,9 @@ input {
 
 .game {
     margin: 25px;
+    color: white;
+}
+
+.game p {
+  margin-bottom: 10px;
 }
