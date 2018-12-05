@@ -27,7 +27,7 @@ $(document).ready(function () {
 var submit_search = function () {
 
   /*** API URL with CORS proxy ***/
-  var url = 'https://cors-anywhere.herokuapp.com/https://api-endpoint.igdb.com/games/?search=' + $('.search-input').val() + '&fields=id,name,summary,rating,genres,platforms,screenshots,videos,cover,esrb,artworks&filter[rating][gte]=70&filter[version_parent][not_exists]=1';
+  var url = 'https://cors-anywhere.herokuapp.com/https://api-endpoint.igdb.com/games/?search=' + $('.search-input').val() + '&fields=id,name,summary,rating,genres,platforms,screenshots,videos,cover,esrb,artworks&filter[rating][gte]=70&order=popularity:desc';
 
   /*** Game Data ***/
   $.ajax({
@@ -80,7 +80,12 @@ var submit_search = function () {
         cover: response[i].hasOwnProperty('cover') ? 'http:' + response[i].cover.url : 'images/noimage.png',
         rating: response[i].hasOwnProperty('rating') ? response[i].rating : 'Not Rated',
         esrb: response[i].hasOwnProperty('esrb') ? (response[i].esrb.hasOwnProperty('rating') ? getEsrbRating(response[i].esrb.rating) : 'Rated: unrated') : 'Rated: unrated',
-        summary: typeof response[i].summary !== 'undefined' ? 'Description: ' + response[i].summary : 'Description: This game has no description.'
+        summary: typeof response[i].summary !== 'undefined' ? 'Description: ' + response[i].summary : 'Description: This game has no description.',
+        media: {
+          screenshots: response[i].hasOwnProperty('screenshots') ? response[i].screenshots : null,
+          videos: response[i].hasOwnProperty('videos') ? response[i].videos : null
+        }
+
       });
 
       if((game_objects.length % 4) > 0)
@@ -285,6 +290,51 @@ var submit_search = function () {
     if(e.keyCode == 13)
     {
       submit_search();
+    }
+  });
+
+  /*** LIGHTBOX CODE ***/
+  var mediaNum = 0;
+
+  /*** OPEN THE MODAL ***/
+  function openModal() {
+    $('#myModal').css("display", "block");
+  }
+
+  /*** CLOSE THE MODAL ***/
+  function closeModal() {
+    $('#myModal').css("display", "none");
+    $('.mySlides').html("");
+  }
+
+  $('.close').click(function(){
+    closeModal();
+    mediaNum = 0;
+  })
+
+  $('.game-cover-div').click(function(){
+    openModal();
+
+    if(game_objects[gameArrIndex].media.hasOwnProperty('videos')) {
+      $('.mySlides').html('<iframe width="90%" height="400px" src="https://www.youtube.com/embed/' + game_objects[gameArrIndex].media.videos[mediaNum].video_id + '"></iframe>');
+    }
+  });
+
+  $('.modal-prev').click(function(){
+    if(game_objects[gameArrIndex].media.hasOwnProperty('videos')){
+      if(mediaNum > 0) {
+        mediaNum--;
+        $('.mySlides').html('<iframe width="90%" height="400px" src="https://www.youtube.com/embed/' + game_objects[gameArrIndex].media.videos[mediaNum].video_id + '"></iframe>')
+      }
+    }
+  });
+
+  $('.modal-next').click(function(){
+    if(game_objects[gameArrIndex].media.hasOwnProperty('videos')) {
+      if(mediaNum < game_objects[gameArrIndex].media.videos.length-1){
+        mediaNum++;
+        $('.mySlides').html('<iframe width="90%" height="400px" src="https://www.youtube.com/embed/' + game_objects[gameArrIndex].media.videos[mediaNum].video_id + '"></iframe>')
+      }
     }
   });
 })
