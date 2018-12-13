@@ -95,7 +95,7 @@ $(document).ready(function () {
       }
 
       countPages(game_objects.length);
-    }
+    
 
   }).done((response) => {
     console.log(response);
