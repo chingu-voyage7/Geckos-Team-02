@@ -88,10 +88,6 @@ $(document).ready(function () {
 
         });
 
-        if ((game_objects.length % 4) > 0)
-          page_count = Math.floor((game_objects.length / 4) + 1);
-        else
-          page_count = game_objects.length / 4;
       }
 
       countPages(game_objects.length);
@@ -209,7 +205,7 @@ $(document).ready(function () {
   }
   
     /*** VIEW GAME INFORMATION MENU ***/
-  $(document).on('click', '.games',() => {
+  $(document).on('click', '.games',function() {
     gameArrIndex = $(this).data('game-num');
     displayGameInfo(gameArrIndex);
     game_veiwing_mode = true;
