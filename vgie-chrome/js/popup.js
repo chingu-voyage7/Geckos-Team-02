@@ -25,7 +25,7 @@ $(document).ready(function () {
   }
 
   let submit_search = () => {
-
+    $('.loader-div').show();
   /*** API URL with CORS proxy ***/
   const url = 'https://cors-anywhere.herokuapp.com/https://api-endpoint.igdb.com/games/?search=' + $('.search-input').val() + '&fields=id,name,summary,rating,genres,platforms,screenshots,videos,cover,esrb,artworks&filter[rating][gte]=70&filter[version_parent][not_exists]=1&limit=20';
 
@@ -88,14 +88,16 @@ $(document).ready(function () {
 
         });
 
-      }
 
-      countPages(game_objects.length);
-    
+      }
+      console.log(response);
+      countPages(game_objects.length, 4);
+
 
   }).done((response) => {
-    console.log(response);
+    console.log(game_objects);
 
+    $('.loader-div').hide();
     initPage();
     addGamesToPage(4, game_objects);
   });
@@ -108,6 +110,11 @@ $(document).ready(function () {
     page_items_end = 4;
     game_num = 0;
     game_veiwing_mode = false;
+    $('.output-tab').removeClass('active');
+    $('#about-tab').addClass('active');
+    $('.tabs').hide();
+    $('.output-scroll-btn').hide();
+    $('.game-cover').attr('src', 'images/noimage.png');
   }
 
   /*** RETURN THE PAGE NUMBER ***/
@@ -123,14 +130,43 @@ $(document).ready(function () {
         return 1;
       }
     }
+
+    $('.page-btn').removeClass('active');
   }
-  
+
   /*** SET THE NUMBER OF PAGES ***/
-  countPages = (n) => {
-    if((n % 4) > 0)
-      page_count = Math.floor((n / 4) + 1);
+  countPages = (n, i) => {
+    if((n % i) > 0)
+      page_count = Math.floor((n / i) + 1);
     else
-      page_count = n / 4;
+      page_count = n / i;
+
+    $('.pages').empty();
+
+    for(let i = 0; i < page_count; i++) {
+      i === 0 ? $('.pages').append('<li><button class="page-btn ' + (i + 1) +' active">' + (i + 1) + '</button></li>' ) :
+      $('.pages').append('<li><button class="page-btn ' +(i + 1)+'">' + (i + 1) + '</button></li>' );
+    }
+
+    $('.pages').show();
+  }
+
+  nextPage = () => {
+    if (page_num < page_count) {
+      page_num++;
+
+      $('.pages .page-btn').removeClass('active');
+      $('.pages .' + page_num).addClass('active');
+    }
+  }
+
+  prevPage = () => {
+    if(page_num > 1) {
+      page_num--;
+
+      $('.pages .page-btn').removeClass('active');
+      $('.pages .' + page_num).addClass('active');
+    }
   }
 
   /*** ADD NUMBER OF GAMES TO PAGE ***/
@@ -147,10 +183,54 @@ $(document).ready(function () {
         return;
       }
     }
+
+    $('.output-scroll-btn').show();
   }
+
+  /*** ADD NUMBER OF VIDEOS TO PAGE ***/
+  addVideosToPage = (num, arr) => {
+    $(".game-output").empty();
+    console.log(arr);
+    num > arr.length ? num : arr.length;
+    for(let i = 0; i < num; i++) {
+      if(arr[i] != null) {
+        $('.game-output').append('<img class="videos" width="240" height="200" src="https://img.youtube.com/vi/' +
+          arr[i].video_id +
+          '/sddefault.jpg">')
+      } else {
+        console.log('returned')
+        return;
+      }
+    }
+  }
+
+  /*** ADD NUMBER OF VIDEOS TO PAGE ***/
+  addScreenshotsToPage = (num, arr) => {
+    $(".game-output").empty();
+    console.log(arr);
+    for(let i = 0; i < num; i++) {
+      if(arr[i] != null) {
+        $('.game-output').append('<img class="screenshots" width="240" height="200" src="http:' +
+        arr[i].url.replace('t_thumb', 't_screenshot_med') +
+        '" alt="video game screenshot">')
+      } else {
+        console.log('returned')
+        return;
+      }
+    }
+  }
+
+  $('.output-prev').click(() => {
+      prevRow();
+  })
+
+  $('.output-next').click(() => {
+      nextRow();
+  })
 
   /*** DISPLAY SELECTED GAME INFORMATION ***/
   displayGameInfo = (n) => {
+    console.log(n);
     $('.game-cover').attr('src', game_objects[n].cover.replace('t_thumb', 't_cover_big'));
 
     $(".game-output").empty();
@@ -161,6 +241,100 @@ $(document).ready(function () {
     '<p class="game-esrb">' + game_objects[n].esrb + '</p>' +
     '<p class="game-reviews">Review: ' + Math.floor(game_objects[n].rating) + '%</p>' +
     '<p class="game-summary">' + game_objects[n].summary + '</p>' + '</div>');
+  }
+
+  /*** DISPLAY SELECTED GAME VIDEOS ***/
+  displayGameVideos = (n) => {
+    console.log(n);
+
+    let num;
+
+    $(".game-output").empty();
+
+    if(game_objects[n].media.hasOwnProperty('videos')) {
+
+      if(game_objects[n].media.videos !== null) {
+        num = game_objects[n].media.videos.length >= 2 ? 2 : game_objects[n].media.videos.length;
+
+        for(let i = 0; i < num; i++) {
+          if(game_objects[n].media.videos[i].hasOwnProperty('video_id')) {
+            $('.game-output').append('<img class="videos" width="240" height="200" src="https://img.youtube.com/vi/' +
+            game_objects[n].media.videos[i].video_id +
+            '/sddefault.jpg">');
+          }
+        }
+
+        countPages(game_objects[n].media.videos.length, 2);
+      } else {
+        $('.game-output').append('<p class="no-videos">No videos for this game</p>');
+      }
+    } else {
+      return;
+    }
+  }
+
+  /*** DISPLAY SELECTED GAME SCREENSHOTS ***/
+  displayGameScreenshots = (n) => {
+    console.log(n);
+
+    let num;
+
+    $(".game-output").empty();
+
+    if(game_objects[n].media.hasOwnProperty('screenshots')) {
+      if(game_objects[n].media.screenshots !== null) {
+        num = game_objects[n].media.screenshots.length >= 2 ? 2 : game_objects[n].media.screenshots.length;
+
+        for(let i = 0; i < num; i++) {
+          $('.game-output').append('<img class="screenshots" width="240" height="200" src="http:' +
+          game_objects[n].media.screenshots[i].url.replace('t_thumb', 't_screenshot_med') +
+          '" alt="video game screenshot">');
+        }
+
+        countPages(game_objects[n].media.screenshots.length, 2);
+      } else {
+        $('.game-output').append('<p class="no-videos">No screenshots for this game</p>');
+      }
+
+    } else {
+      return;
+    }
+  }
+
+  /*** OPEN NEW TAB ***/
+  $('.tabs').click((e) => {
+
+    if($(e.target).is('#about-tab')) {
+      if(!$(e.target).hasClass('active')) {
+        $('.output-tab').removeClass('active');
+        $('#about-tab').addClass('active');
+        displayGameInfo(gameArrIndex);
+        $('.output-scroll-btn').hide();
+      }
+    } else if ($(e.target).is('#videos-tab')) {
+      if(!$(e.target).hasClass('active')) {
+        page_num = 1;
+        $('.output-tab').removeClass('active');
+        $('#videos-tab').addClass('active');
+        displayGameVideos(gameArrIndex);
+        $('.output-scroll-btn').show();
+      }
+    } else if ($(e.target).is('#screenshots-tab')) {
+      if(!$(e.target).hasClass('active')) {
+        page_num = 1;
+        $('.output-tab').removeClass('active');
+        $('#screenshots-tab').addClass('active');
+        displayGameScreenshots(gameArrIndex);
+        $('.output-scroll-btn').show();
+      }
+    }
+
+  })
+
+  /*** RESET TO DEFAULT TAB ***/
+  resetTab = () => {
+    $('.output-tab').removeClass('active');
+    $('#about-tab').addClass('active');
   }
 
   /*** GO TO THE NEXT GAME IN GAME INFO MENU ***/
@@ -176,43 +350,86 @@ $(document).ready(function () {
   /*** GO TO THE NEXT ROW IN GAME SELECTION MENU ***/
   nextRow = () => {
 
-    if (page_num < page_count) {
-      page_items_start += 4
-      page_items_end += 4;
+    if(!game_veiwing_mode) {
+      if (page_num < page_count) {
+        page_items_start += 4
+        page_items_end += 4;
 
-      let curArr = game_objects.slice(page_items_start, page_items_end);
-      addGamesToPage(curArr.length, curArr);
-      page_num++;
+        let curArr = game_objects.slice(page_items_start, page_items_end);
+        addGamesToPage(curArr.length, curArr);
+
+        getPageNum(gameArrIndex);
+        nextPage();
+      }
+    } else {
+      if (page_num < page_count) {
+        if($('.videos-list').hasClass('active')) {
+          let a = page_num * 2;
+          let b = a + 2;
+          let curArr = game_objects[gameArrIndex].media.videos.slice(a, b);
+          addVideosToPage(2, curArr);
+          nextPage();
+        } else if ($('.screenshots-list').hasClass('active')) {
+          let a = page_num * 2;
+          let b = a + 2;
+          let curArr = game_objects[gameArrIndex].media.screenshots.slice(a, b);
+          addScreenshotsToPage(2, curArr);
+          nextPage();
+        }
+      }
     }
+
   }
 
   /*** RETURN TO PREVIOUS ROW IN GAME SELECTION MENU ***/
   prevRow = () => {
 
-    if (page_num > 1) {
+    if(!game_veiwing_mode) {
+      if (page_num > 1) {
 
-      page_items_start -= 4;
-      page_items_end -= 4;
-      game_num = ((page_num - 1) * 4) - 4;
+        page_items_start -= 4;
+        page_items_end -= 4;
+        game_num = ((page_num - 1) * 4) - 4;
 
-      let curArr = game_objects.slice(page_items_start, page_items_end);
-      
-      addGamesToPage(4, curArr);
+        let curArr = game_objects.slice(page_items_start, page_items_end);
+        addGamesToPage(4, curArr);
 
-      page_num--;
-
+        getPageNum(gameArrIndex);
+        prevPage();
+      }
+    } else {
+      if (page_num > 1) {
+        if($('.videos-list').hasClass('active')) {
+          let a = ((page_num - 1) * 2) - 2;
+          let b = a + 2;
+          let curArr = game_objects[gameArrIndex].media.videos.slice(a, b);
+          addVideosToPage(2, curArr);
+          prevPage();
+        } else if ($('.screenshots-list').hasClass('active')) {
+          let a = ((page_num - 1) * 2) - 2;
+          let b = a + 2;
+          let curArr = game_objects[gameArrIndex].media.screenshots.slice(a, b);
+          addScreenshotsToPage(2, curArr);
+          prevPage();
+        }
+      }
     }
+
   }
-  
+
     /*** VIEW GAME INFORMATION MENU ***/
   $(document).on('click', '.games',function() {
     gameArrIndex = $(this).data('game-num');
     displayGameInfo(gameArrIndex);
     game_veiwing_mode = true;
+    $('.tabs').show();
+    $('.switch-btn').show();
+    $('.pages').hide();
+    $('.output-scroll-btn').hide();
   })
 
   /*** RETURN TO GAME SELECTION MENU ***/
-  $('.game-cover-div').click(() => {
+  $('.switch-btn').click(() => {
     if(game_veiwing_mode) {
 
       page_num = getPageNum(gameArrIndex);
@@ -222,10 +439,17 @@ $(document).ready(function () {
 
       let curArr = game_objects.slice(page_items_start, page_items_end);
 
-      $('.game_cover').attr('src', 'images/noimage.png');
+      $('.game-cover').attr('src', 'images/noimage.png');
 
       addGamesToPage(curArr.length, curArr);
       game_veiwing_mode = false;
+      $('.tabs').hide();
+      $('.switch-btn').hide();
+      countPages(game_objects.length, 4);
+      $('.pages').show();
+      resetTab();
+      $('.pages .page-btn').removeClass('active');
+      $('.pages .' + page_num).addClass('active');
     }
   })
 
@@ -235,6 +459,8 @@ $(document).ready(function () {
       if(gameArrIndex < game_objects.length-1) {
         gameArrIndex >= game_objects.length-1 ? game_objects.length-1 : gameArrIndex++;
         nextGame();
+        resetTab();
+        $('.pages').hide();
       }
     } else {
       nextRow();
@@ -246,6 +472,8 @@ $(document).ready(function () {
     if(game_veiwing_mode) {
       gameArrIndex <= 0 ? 0 : gameArrIndex--;
       prevGame();
+      resetTab();
+      $('.pages').hide();
     } else {
       prevRow();
     }
@@ -278,29 +506,69 @@ $(document).ready(function () {
     mediaNum = 0;
   })
 
-  $('.game-cover-div').click(() => {
+  /*** DISPLAY VIDEO IN MODAL ***/
+  $(document).on('click', '.videos',function(){
     openModal();
 
-    if (game_objects[gameArrIndex].media.hasOwnProperty('videos')) {
-      $('.mySlides').html('<iframe width="90%" height="400px" src="https://www.youtube.com/embed/' + game_objects[gameArrIndex].media.videos[mediaNum].video_id + '"></iframe>');
-    }
-  });
+    mediaNum = ((page_num * 2) - 2) + $(this).index();
 
+    if (game_objects[gameArrIndex].media.hasOwnProperty('videos')) {
+      $('.mySlides').html('<iframe width="90%" height="400px" src="https://www.youtube.com/embed/' +
+      game_objects[gameArrIndex].media.videos[mediaNum].video_id + '"></iframe>');
+    }
+  })
+
+  /*** DISPLAY IMAGE IN MODAL ***/
+  $(document).on('click', '.screenshots',function(){
+    openModal();
+
+    mediaNum = ((page_num * 2) - 2) + $(this).index();
+
+    if (game_objects[gameArrIndex].media.hasOwnProperty('screenshots')) {
+      $('.mySlides').html('<img width="90%" height="400px" src="http:' +
+      game_objects[gameArrIndex].media.screenshots[mediaNum].url.replace('t_thumb', 't_screenshot_med') + '">');
+    }
+  })
+
+  /*** SCROLL TO PREVIOUS VIDEO OR IMAGE ***/
   $('.modal-prev').click(() => {
-    if (game_objects[gameArrIndex].media.hasOwnProperty('videos')) {
-      if (mediaNum > 0) {
-        mediaNum--;
-        $('.mySlides').html('<iframe width="90%" height="400px" src="https://www.youtube.com/embed/' + game_objects[gameArrIndex].media.videos[mediaNum].video_id + '"></iframe>')
+    if($('.videos-list').hasClass('active')) {
+      if (game_objects[gameArrIndex].media.hasOwnProperty('videos')) {
+        if (mediaNum > 0) {
+          mediaNum--;
+          $('.mySlides').html('<iframe width="90%" height="400px" src="https://www.youtube.com/embed/' + game_objects[gameArrIndex].media.videos[mediaNum].video_id + '"></iframe>')
+        }
+      }
+    } else if ($('.screenshots-list').hasClass('active')) {
+      if (game_objects[gameArrIndex].media.hasOwnProperty('screenshots')) {
+        if (mediaNum > 0) {
+          mediaNum--;
+          $('.mySlides').html('<img width="90%" height="400px" src="http:' +
+          game_objects[gameArrIndex].media.screenshots[mediaNum].url.replace('t_thumb', 't_screenshot_med') + '">')
+        }
       }
     }
+
   });
 
+  /*** SCROLL TO NEXT VIDEO OR IMAGE ***/
   $('.modal-next').click(() => {
-    if (game_objects[gameArrIndex].media.hasOwnProperty('videos')) {
-      if (mediaNum < game_objects[gameArrIndex].media.videos.length - 1) {
-        mediaNum++;
-        $('.mySlides').html('<iframe width="90%" height="400px" src="https://www.youtube.com/embed/' + game_objects[gameArrIndex].media.videos[mediaNum].video_id + '"></iframe>')
+    if($('.videos-list').hasClass('active')) {
+      if (game_objects[gameArrIndex].media.hasOwnProperty('videos')) {
+        if (mediaNum < game_objects[gameArrIndex].media.videos.length - 1) {
+          mediaNum++;
+          $('.mySlides').html('<iframe width="90%" height="400px" src="https://www.youtube.com/embed/' + game_objects[gameArrIndex].media.videos[mediaNum].video_id + '"></iframe>')
+        }
+      }
+    } else if ($('.screenshots-list').hasClass('active')) {
+      if (game_objects[gameArrIndex].media.hasOwnProperty('screenshots')) {
+        if (mediaNum < game_objects[gameArrIndex].media.screenshots.length - 1) {
+          mediaNum++;
+          $('.mySlides').html('<img width="90%" height="400px" src="http:' +
+          game_objects[gameArrIndex].media.screenshots[mediaNum].url.replace('t_thumb', 't_screenshot_med') + '">')
+        }
       }
     }
+
   });
 })
