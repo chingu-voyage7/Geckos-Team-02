@@ -151,6 +151,42 @@ $(document).ready(function () {
     $('.pages').show();
   }
 
+  $(document).on('click', '.page-btn',function() {
+    if(!game_veiwing_mode) {
+      page_num = parseInt($(this).text());
+      game_num = (page_num * 4) - 4;
+      page_items_start = game_num;
+      page_items_end = page_items_start + 4;
+
+      let curArr = game_objects.slice(page_items_start, page_items_end);
+
+      addGamesToPage(curArr.length, curArr);
+
+      $('.pages .page-btn').removeClass('active');
+      $('.pages .' + page_num).addClass('active');
+    } else {
+      if($('.videos-list').hasClass('active')) {
+        page_num = parseInt($(this).text());
+        let a = (page_num * 2) - 2;
+        let b = a + 2;
+        let curArr = game_objects[gameArrIndex].media.videos.slice(a, b);
+        addVideosToPage(2, curArr);
+
+        $('.pages .page-btn').removeClass('active');
+        $('.pages .' + page_num).addClass('active');
+      } else if($('.screenshots-list').hasClass('active')) {
+        page_num = parseInt($(this).text());
+        let a = (page_num * 2) - 2;
+        let b = a + 2;
+        let curArr = game_objects[gameArrIndex].media.screenshots.slice(a, b);
+        addScreenshotsToPage(2, curArr);
+
+        $('.pages .page-btn').removeClass('active');
+        $('.pages .' + page_num).addClass('active');
+      }
+    }
+  })
+
   nextPage = () => {
     if (page_num < page_count) {
       page_num++;
