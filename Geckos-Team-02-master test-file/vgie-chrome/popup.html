@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/main.css">
+    <title>VGIE Popup</title>
+</head>
+<body>
+    <!-- <div class="container">
+        <div class="user_input">
+             <input type="text" id="input" placeholder="search">
+             <input type="submit" id="submit" placeholder="seach">
+       </div>
+        <div class="result">
+            result
+        </div>
+    </div> -->
+    <div class="container" style="">
+        <div class="search-input-div" style="grid-area:1 / 1 / 2 / 3;">
+            <input class="search-input orange-border"/>
+        </div>
+        <div class="search-icon-div" style="grid-area:1 / 3 / 2 / 4;">
+            <button class="search-submit orange-border">
+                <img class="search-icon" src="images/magnifying-glass.png" width="80px" height="80px"/>
+            </button>
+        </div>
+        <div class="previous-icon-div" style="grid-area:2 / 1 / 3 / 2;">
+            <button class="previous-submit orange-border">
+                <img class="previous-icon" src="images/arrow-left.png" width="80px" height="80px"/>
+            </button>
+        </div>
+        <div class="next-icon-div" style="grid-area:2 / 3 / 3 / 4;">
+            <button class="next-submit orange-border">
+                <img class="next-icon" src="images/arrow-right.png" width="80px" height="80px"/>
+            </button>
+        </div>
+        <div class="game-cover-div" style="grid-area:2 / 2 / 3 / 3;">
+            <img class="game-cover orange-border" src="images/noimage.png" width="180px" height="180px"/>
+        </div>
+
+        <div class="game-output-div" style="grid-area:3 / 1 / 4 / 4;">
+          <ul class="tabs">
+            <li><button class="output-tab about-list active" id="about-tab">About</button></li>
+            <li><button class="output-tab videos-list" id="videos-tab">Videos</button></li>
+            <li><button class="output-tab screenshots-list" id="screenshots-tab">Screenshots</button></li>
+          </ul>
+          <button class="switch-btn"><p>&#8644;</p></button>
+          <button class="output-scroll-btn output-prev">&#10094;</button>
+          <button class="output-scroll-btn output-next">&#10095;</button>
+          <p class="game-output orange-border">WELCOME TO THE VGIE (Video Game Information Extension). Search for your favourite game above to find information about it. You can find reviews, ratings, game cover art and a description.</p>
+        </div>
+
+        <div class="pages-div">
+          <ul class="pages">
+
+          </ul>
+        </div>
+
+        <div class="loader-div">
+          <div class="loader"></div>
+        </div>
+    </div>
+
+    <div id="myModal" class="modal">
+      <span class="close">&times;</span>
+      <div class="modal-content">
+        <div class="mySlides">
+          <!--<img src="images/noimage.png" style="width:90%">-->
+        </div>
+        <button class="modal-prev">&#10094;</button>
+        <button class="modal-next">&#10095;</button>
+      </div>
+    </div>
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/popup.js"></script>
+</body>
+</html>
